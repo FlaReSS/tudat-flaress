@@ -11,7 +11,7 @@
 cmake_minimum_required(VERSION 2.6)
 
 # Specify project name.
-project(PhobosStateEstimation)
+project(DopplerDataSimulation)
 
 # Load UserSettings.txt
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
@@ -175,52 +175,11 @@ else()
   endif( )
 endif( )
 
-list(APPEND TUDAT_APPLICATION_EXTERNAL_LIBRARIES "")
-list(APPEND TUDAT_APPLICATION_EXTERNAL_INTERFACE_LIBRARIES "")
-list(APPEND TUDAT_APPLICATION_ITRS_LIBRARIES "")
 
+# Set compiler based on preferences (e.g. USE_CLANG) and system.
+include(tudatLinkLibraries)
 
-if(USE_SOFA)
- list(APPEND TUDAT_APPLICATION_EXTERNAL_LIBRARIES sofa)
- list(APPEND TUDAT_APPLICATION_EXTERNAL_INTERFACE_LIBRARIES tudat_sofa_interface )
- list(APPEND TUDAT_APPLICATION_ITRS_LIBRARIES tudat_earth_orientation )
-endif()
+add_executable(application_DopplerDataSimulationFlaress "${SRCROOT}/dopplerDataSimulation.cpp")
+setup_executable_target(application_DopplerDataSimulationFlaress "${SRCROOT}")
+target_link_libraries(application_DopplerDataSimulationFlaress json_interface_library ${TUDAT_ESTIMATION_LIBRARIES} ${Boost_LIBRARIES} )
 
-if(USE_CSPICE)
-  list(APPEND TUDAT_APPLICATION_EXTERNAL_LIBRARIES cspice)
-  list(APPEND TUDAT_APPLICATION_EXTERNAL_INTERFACE_LIBRARIES tudat_spice_interface )
-endif()
-
-if(USE_JSON)
-  list(APPEND TUDAT_EXTERNAL_LIBRARIES nlohmann_json)
-endif()
-
-if(USE_NRLMSISE00)
-  list(APPEND TUDAT_APPLICATION_EXTERNAL_LIBRARIES nrlmsise00)
-endif()
-
-
-
-list(APPEND TUDAT_APPLICATION_PROPAGATION_LIBRARIES tudat_trajectory_design tudat_propagation_setup tudat_environment_setup tudat_ground_stations tudat_propagators
-    tudat_aerodynamics tudat_system_models tudat_geometric_shapes tudat_relativity tudat_gravitation tudat_mission_segments
-    tudat_electro_magnetism tudat_propulsion tudat_ephemerides ${TUDAT_APPLICATION_ITRS_LIBRARIES} tudat_reference_frames
-     tudat_statistics tudat_propagators ${TUDAT_APPLICATION_EXTERNAL_INTERFACE_LIBRARIES} tudat_basic_astrodynamics tudat_root_finders tudat_interpolators tudat_numerical_integrators tudat_basic_mathematics
-     tudat_input_output tudat_basics ${TUDAT_APPLICATION_EXTERNAL_LIBRARIES})
-
-
-list(APPEND TUDAT_APPLICATION_ESTIMATION_LIBRARIES tudat_trajectory_design tudat_estimation_setup tudat_propagation_setup tudat_environment_setup  tudat_observation_models tudat_ground_stations tudat_acceleration_partials
-    tudat_torque_partials tudat_observation_partials tudat_orbit_determination tudat_estimatable_parameters  tudat_propagators
-    tudat_aerodynamics tudat_system_models tudat_geometric_shapes tudat_relativity tudat_gravitation tudat_mission_segments
-    tudat_electro_magnetism tudat_propulsion tudat_ephemerides ${TUDAT_APPLICATION_ITRS_LIBRARIES} tudat_reference_frames
-    tudat_statistics tudat_propagators ${TUDAT_APPLICATION_EXTERNAL_INTERFACE_LIBRARIES} tudat_basic_astrodynamics tudat_root_finders tudat_interpolators tudat_numerical_integrators tudat_basic_mathematics
-    tudat_input_output tudat_basics ${TUDAT_APPLICATION_EXTERNAL_LIBRARIES})
-
-
-
-add_executable(application_PhobosCoupledStateEstimation "${SRCROOT}/phobosRotationalStateEstimation.cpp")
-setup_executable_target(application_PhobosCoupledStateEstimation "${SRCROOT}")
-target_link_libraries(application_PhobosCoupledStateEstimation ${TUDAT_APPLICATION_ESTIMATION_LIBRARIES} ${Boost_LIBRARIES} )
-
-add_executable(application_PhobosCoupledStateAnalysis "${SRCROOT}/phobosRotationalDynamicsAnalysis.cpp")
-setup_executable_target(application_PhobosCoupledStateAnalysis "${SRCROOT}")
-target_link_libraries(application_PhobosCoupledStateAnalysis ${TUDAT_APPLICATION_ESTIMATION_LIBRARIES} ${Boost_LIBRARIES} )
